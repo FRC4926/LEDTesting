@@ -17,17 +17,56 @@ public class LEDSubsystem extends SubsystemBase {
     private final AddressableLED led = new AddressableLED(LEDConstants.port);
     private final AddressableLEDBuffer ledBuffer = new AddressableLEDBuffer(LEDConstants.numLeds);
     private int x = 0;
-    LEDPattern scrollingGalactechRainbow = (reader, writer) -> {
+    private int y=0;
+    // LEDPattern scrollingGalactechRainbow = (reader, writer) -> {
+    //     SmartDashboard.putNumber("len", reader.getLength()); 
+    //     for (int i = 0; i < LEDConstants.numLeds; i++) {
+    //         if (0 <= (i - x) && (i - x) <= 2) {
+    //             writer.setLED(i, Color.kGreen);
+    //         } else {
+    //             writer.setLED(i, Color.kPurple);
+    //         }
+    //     }
+    //     x++;
+    //     x %= LEDConstants.numLeds;
+    //     SmartDashboard.putNumber("x", x);
+    // };
+
+    double b = 0;
+
+    LEDPattern scrollingGalactechRainbow2 = (reader, writer) -> {
         SmartDashboard.putNumber("len", reader.getLength()); 
         for (int i = 0; i < LEDConstants.numLeds; i++) {
-            if (0 <= (i - x) && (i - x) <= 2) {
+            if(i<=1){
                 writer.setLED(i, Color.kGreen);
+            }
+            else if (i<=x-2) {
+                writer.setLED(i, Color.kGreen);  
             } else {
                 writer.setLED(i, Color.kPurple);
             }
         }
-        x++;
-        x %= LEDConstants.numLeds;
+
+        //b is for bias, so it wants to go up when at the bottom and wants to go down at the top
+
+        b = 0;
+        if(x > 13){
+            b = 0.5;
+        }
+        if(x < 6){
+            b = -0.5;
+        }
+
+        if(y%3==0){
+        x = x + (int)((Math.round(Math.random()) - (0.5 + b)) * 2);
+        if(x < 2){
+            x = 2;
+        }
+        if(x > 15){
+            x = 15;
+        }
+        y=0;
+        }
         SmartDashboard.putNumber("x", x);
     };
 
@@ -41,8 +80,9 @@ public class LEDSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-        scrollingGalactechRainbow.applyTo(ledBuffer);
+        scrollingGalactechRainbow2.applyTo(ledBuffer);
         led.setData(ledBuffer);
+        y++;
     }
 
 
